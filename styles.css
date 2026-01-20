@@ -1,0 +1,817 @@
+:root {
+  --ink: #1a1411;
+  --wine: #7a1d2b;
+  --wine-dark: #4d0e1a;
+  --gold: #d6b36a;
+  --cream: #f7f1e6;
+  --stone: #e8dfd2;
+  --shadow: rgba(26, 20, 17, 0.14);
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: "Space Grotesk", sans-serif;
+  color: var(--ink);
+  background: radial-gradient(circle at top, #fef5e7 0%, #f1e0c7 40%, #d9c1a4 100%);
+  min-height: 100vh;
+}
+
+body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  background: linear-gradient(120deg, rgba(122, 29, 43, 0.12), transparent 60%),
+    repeating-linear-gradient(45deg, rgba(255, 255, 255, 0.04), rgba(255, 255, 255, 0.04) 6px, transparent 6px, transparent 12px);
+  pointer-events: none;
+  z-index: -1;
+}
+
+.app {
+  max-width: 980px;
+  margin: 0 auto;
+  padding: 48px 20px 64px;
+  display: grid;
+  gap: 28px;
+}
+
+.hero {
+  background: linear-gradient(135deg, rgba(122, 29, 43, 0.9), rgba(77, 14, 26, 0.96));
+  color: #fff7ef;
+  padding: 32px;
+  border-radius: 24px;
+  box-shadow: 0 20px 40px var(--shadow);
+  position: relative;
+  overflow: hidden;
+}
+
+.hero::after {
+  content: "";
+  position: absolute;
+  width: 320px;
+  height: 320px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(214, 179, 106, 0.35), transparent 70%);
+  top: -120px;
+  right: -80px;
+}
+
+.eyebrow {
+  text-transform: uppercase;
+  letter-spacing: 0.2em;
+  font-size: 0.75rem;
+  margin-bottom: 12px;
+  opacity: 0.7;
+}
+
+.hero h1 {
+  font-family: "Fraunces", serif;
+  font-size: clamp(2.1rem, 4vw, 3.2rem);
+  margin-bottom: 12px;
+}
+
+.lede {
+  font-size: 1.05rem;
+  max-width: 520px;
+}
+
+.panel {
+  background: var(--cream);
+  padding: 24px;
+  border-radius: 18px;
+  box-shadow: 0 14px 30px var(--shadow);
+  display: grid;
+  gap: 16px;
+}
+
+.panel-body {
+  display: grid;
+  gap: 16px;
+}
+
+#finalPanel {
+  text-align: center;
+  font-family: "Fraunces", serif;
+  font-size: 1.4rem;
+}
+
+.answer-correct {
+  color: #2d5a3b;
+  font-weight: 700;
+}
+
+.answer-wrong {
+  color: #7a1d2b;
+  font-weight: 700;
+}
+
+.answer-skip {
+  color: #3b2a1f;
+  font-weight: 600;
+}
+
+.panel-header h2 {
+  font-family: "Fraunces", serif;
+  font-size: 1.5rem;
+  margin-bottom: 4px;
+}
+
+.panel-header p {
+  color: #4f3b2a;
+}
+
+.panel.minimized .panel-body {
+  display: none;
+}
+
+.panel.minimized .panel-header .helper:not(.done-hint) {
+  display: none;
+}
+
+.wine-input {
+  display: grid;
+  gap: 12px;
+  grid-template-columns: 1fr auto;
+}
+
+input[type="text"] {
+  padding: 12px 14px;
+  border-radius: 12px;
+  border: 1px solid #c8b8a1;
+  font-size: 1rem;
+  background: #fffdf9;
+}
+
+button {
+  border: none;
+  padding: 12px 20px;
+  border-radius: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  background: var(--wine);
+  color: #fff7ef;
+}
+
+button:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 8px 20px rgba(122, 29, 43, 0.25);
+}
+
+button.ghost {
+  background: transparent;
+  color: var(--wine-dark);
+  border: 1px solid rgba(77, 14, 26, 0.3);
+  padding: 8px 14px;
+}
+
+.helper {
+  color: #5a4b39;
+  font-size: 0.95rem;
+}
+
+.sample-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.sample {
+  border: 1px dashed rgba(77, 14, 26, 0.4);
+  padding: 6px 10px;
+  border-radius: 999px;
+  font-size: 0.85rem;
+  cursor: pointer;
+  background: #fff;
+  color: #2b1a14;
+}
+
+.status {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 14px;
+  border-radius: 12px;
+  background: #fff;
+  border: 1px solid rgba(200, 184, 161, 0.6);
+  min-height: 48px;
+  font-weight: 600;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+#scoreText {
+  margin-left: auto;
+  font-weight: 700;
+  color: #3b2a1f;
+}
+
+.status.success {
+  border-color: rgba(79, 127, 93, 0.6);
+  color: #2d5a3b;
+}
+
+.status.error {
+  border-color: rgba(178, 66, 55, 0.6);
+  color: #7a1d2b;
+}
+
+@media (max-width: 820px) {
+  .app {
+    padding: 28px 16px 48px;
+  }
+
+  .panel {
+    padding: 18px;
+  }
+
+  .panel-header h2 {
+    font-size: 1.3rem;
+  }
+
+  .wine-input {
+    grid-template-columns: 1fr;
+  }
+
+  .status {
+    align-items: flex-start;
+  }
+
+  #scoreText {
+    margin-left: 0;
+  }
+
+  #nextBtn,
+  #resetBtn {
+    width: 100%;
+  }
+
+  .map {
+    min-height: 280px;
+  }
+
+  .map-inner {
+    min-height: 280px;
+  }
+
+  .options {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 480px) {
+  body {
+    font-size: 15px;
+  }
+
+  .hero {
+    padding: 24px;
+  }
+
+  button,
+  input[type="text"],
+  input[type="number"],
+  #yearInput[type="range"] {
+    min-height: 44px;
+  }
+
+  .map {
+    min-height: 240px;
+  }
+
+  .map-inner {
+    min-height: 240px;
+  }
+
+  #yearBubble {
+    top: 46px;
+  }
+}
+
+.hidden {
+  display: none;
+}
+
+.map {
+  position: relative;
+  min-height: 360px;
+  border-radius: 18px;
+  border: 1px solid rgba(122, 29, 43, 0.2);
+  background: #f8f4ec;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.map-controls {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-weight: 600;
+  color: #3b2a1f;
+}
+
+.debug-panel {
+  border: 1px dashed rgba(26, 20, 17, 0.25);
+  border-radius: 12px;
+  padding: 10px 12px;
+  background: rgba(255, 255, 255, 0.7);
+  font-size: 0.85rem;
+}
+
+.debug-panel pre {
+  margin-top: 8px;
+  white-space: pre-wrap;
+  font-family: "Space Grotesk", sans-serif;
+  color: #3b2a1f;
+}
+
+.map-inner.debug .hotspot {
+  cursor: move;
+}
+
+.map-inner.debug .hotspot.selected {
+  outline: 2px solid #7a1d2b;
+  outline-offset: 2px;
+}
+
+.map-controls .ghost {
+  padding: 6px 12px;
+  min-width: 38px;
+}
+
+.map-inner {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  transform-origin: center;
+  transition: transform 0.2s ease;
+}
+
+.map-inner.world {
+  background-image: url("world-map.png");
+  background-size: contain;
+  background-repeat: no-repeat;
+  background-position: center;
+}
+
+.map-inner.france {
+  background-image: url("france-map-labeled.svg");
+  background-size: contain;
+  background-repeat: no-repeat;
+  background-position: center;
+  aspect-ratio: 1 / 1;
+  height: 100%;
+  width: auto;
+  max-width: 100%;
+  max-height: 100%;
+}
+
+.map-inner.bordeaux {
+  background-image: url("bordeaux-map.png");
+  background-size: contain;
+  background-repeat: no-repeat;
+  background-position: center;
+  aspect-ratio: 1570 / 1080;
+  height: 100%;
+  width: auto;
+  max-width: 100%;
+  max-height: 100%;
+}
+
+.map-inner .tile {
+  position: absolute;
+  border-radius: 16px;
+  display: grid;
+  place-items: center;
+  background: rgba(255, 255, 255, 0.85);
+  border: 1px solid rgba(122, 29, 43, 0.25);
+  font-weight: 600;
+  text-align: center;
+  padding: 6px 10px;
+  transition: transform 0.2s ease, background 0.2s ease, box-shadow 0.2s ease;
+  box-shadow: 0 6px 16px rgba(26, 20, 17, 0.1);
+  color: #24140f;
+}
+
+.tile:hover {
+  transform: translateY(-2px);
+  background: #fff7ef;
+}
+
+.tile.active {
+  outline: 2px solid rgba(122, 29, 43, 0.5);
+  background: rgba(214, 179, 106, 0.3);
+}
+
+.options {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+  gap: 12px;
+}
+
+.year-panel {
+  display: grid;
+  gap: 12px;
+  padding: 16px;
+  border-radius: 14px;
+  background: rgba(255, 255, 255, 0.7);
+  border: 1px dashed rgba(122, 29, 43, 0.25);
+}
+
+.year-panel h3 {
+  font-family: "Fraunces", serif;
+  font-size: 1.2rem;
+}
+
+.year-slider {
+  display: grid;
+  gap: 10px;
+  position: relative;
+}
+
+.year-scale {
+  display: flex;
+  justify-content: space-between;
+  font-weight: 600;
+  color: #3b2a1f;
+}
+
+#yearValue {
+  font-weight: 700;
+}
+
+#yearInput[type="range"] {
+  width: 100%;
+  -webkit-appearance: none;
+  appearance: none;
+  height: 4px;
+  background: rgba(26, 20, 17, 0.2);
+  border-radius: 999px;
+  outline: none;
+}
+
+#yearBubble {
+  position: absolute;
+  top: 40px;
+  transform: translateX(-50%);
+  background: #7a1d2b;
+  color: #fff7ef;
+  padding: 2px 8px;
+  border-radius: 999px;
+  font-size: 0.8rem;
+  font-weight: 700;
+  pointer-events: none;
+}
+
+#yearRange {
+  font-size: 0.85rem;
+  color: #6a4a36;
+}
+
+#yearInput[type="range"]::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: #7a1d2b;
+  border: 2px solid #fff7ef;
+  box-shadow: 0 6px 12px rgba(26, 20, 17, 0.2);
+  cursor: pointer;
+}
+
+#yearInput[type="range"]::-moz-range-thumb {
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: #7a1d2b;
+  border: 2px solid #fff7ef;
+  box-shadow: 0 6px 12px rgba(26, 20, 17, 0.2);
+  cursor: pointer;
+}
+
+.year-slider::after {
+  content: "";
+  position: absolute;
+  left: 50%;
+  top: 56px;
+  transform: translateX(-50%);
+  width: 2px;
+  height: 10px;
+  background: rgba(26, 20, 17, 0.35);
+}
+
+.grape-panel {
+  display: grid;
+  gap: 12px;
+  padding: 16px;
+  border-radius: 14px;
+  background: rgba(255, 255, 255, 0.7);
+  border: 1px dashed rgba(122, 29, 43, 0.25);
+}
+
+.grape-panel h3 {
+  font-family: "Fraunces", serif;
+  font-size: 1.2rem;
+}
+
+.panel.hidden {
+  display: none;
+}
+
+.option-btn {
+  background: #fff;
+  color: #24140f;
+  border: 1px solid rgba(122, 29, 43, 0.25);
+}
+
+.footer {
+  text-align: center;
+  font-size: 0.95rem;
+  background: #fdf8f0;
+}
+
+.mono {
+  font-family: "Space Grotesk", sans-serif;
+  background: rgba(122, 29, 43, 0.08);
+  padding: 2px 6px;
+  border-radius: 6px;
+}
+
+.map-inner .france {
+  top: 29%;
+  left: 43%;
+  width: 86px;
+}
+
+.map-inner .italy {
+  top: 36%;
+  left: 49%;
+  width: 76px;
+}
+
+.map-inner .spain {
+  top: 36%;
+  left: 40%;
+  width: 86px;
+}
+
+.map-inner .germany {
+  top: 30%;
+  left: 60.5%;
+  width: 92px;
+}
+
+.map-inner .usa {
+  top: 30%;
+  left: 22%;
+  width: 118px;
+}
+
+.map-inner .argentina {
+  top: 75%;
+  left: 29%;
+  width: 110px;
+}
+
+.map-inner .chile {
+  top: 69%;
+  left: 26%;
+  width: 86px;
+}
+
+.map-inner .south-africa {
+  top: 73%;
+  left: 49%;
+  width: 116px;
+}
+
+.map-inner .australia {
+  top: 71%;
+  left: 70%;
+  width: 116px;
+}
+
+.map-inner .new-zealand {
+  top: 76%;
+  left: 80%;
+  width: 92px;
+}
+
+.map-inner.france .tile {
+  font-size: 0.78rem;
+  padding: 6px 8px;
+}
+
+.map-inner.france .hotspot {
+  background: transparent;
+  border: none;
+  box-shadow: none;
+  color: transparent;
+  padding: 0;
+}
+
+.map-inner.bordeaux .hotspot {
+  background: transparent;
+  border: none;
+  box-shadow: none;
+  color: transparent;
+  padding: 0;
+}
+
+.map-inner.france .hotspot:focus-visible {
+  outline: 2px solid #1a1411;
+  outline-offset: 2px;
+}
+
+.map-inner.debug .hotspot {
+  background: rgba(255, 255, 255, 0.5);
+  border: 2px dashed rgba(26, 20, 17, 0.6);
+  color: #1a1411;
+}
+
+.map-inner.debug .hotspot::after {
+  content: attr(data-label);
+  font-size: 0.75rem;
+  font-weight: 700;
+  text-transform: uppercase;
+}
+
+.map-inner.france .loire-dalen {
+  left: 14.71%;
+  top: 11.56%;
+  width: 9.71%;
+  height: 2.59%;
+}
+
+.map-inner.france .champagne {
+  left: 56.89%;
+  top: 8.33%;
+  width: 22.02%;
+  height: 5.64%;
+}
+
+.map-inner.france .alsace {
+  left: 78.54%;
+  top: 19.61%;
+  width: 12.77%;
+  height: 3.52%;
+}
+
+.map-inner.france .bourgogne {
+  left: 73.17%;
+  top: 37.65%;
+  width: 25.16%;
+  height: 2.59%;
+}
+
+.map-inner.france .beaujolais {
+  left: 71.42%;
+  top: 49.40%;
+  width: 24.88%;
+  height: 3.24%;
+}
+
+.map-inner.france .rhone-dalen {
+  left: 77.06%;
+  top: 59.11%;
+  width: 16.47%;
+  height: 3.52%;
+}
+
+.map-inner.france .provence {
+  left: 50.79%;
+  top: 76.13%;
+  width: 17.95%;
+  height: 5.46%;
+}
+
+.map-inner.france .sud-ouest {
+  left: 4.16%;
+  top: 71.60%;
+  width: 22.39%;
+  height: 5.37%;
+}
+
+.map-inner.france .languedoc-roussillon {
+  left: 20.17%;
+  top: 81.04%;
+  width: 21.92%;
+  height: 6.48%;
+}
+
+.map-inner.france .bordeaux {
+  left: 4.26%;
+  top: 47.55%;
+  width: 19.15%;
+  height: 2.59%;
+}
+
+.map-inner.bordeaux .haut-medoc {
+  left: 16.79%;
+  top: 24.39%;
+  width: 14.01%;
+  height: 3.70%;
+}
+
+.map-inner.bordeaux .medoc {
+  left: 24.16%;
+  top: 41.27%;
+  width: 7.64%;
+  height: 3.24%;
+}
+
+.map-inner.bordeaux .pessac-leognan {
+  left: 19.75%;
+  top: 59.09%;
+  width: 14.01%;
+  height: 3.24%;
+}
+
+.map-inner.bordeaux .graves {
+  left: 30.55%;
+  top: 68.46%;
+  width: 8.92%;
+  height: 3.24%;
+}
+
+.map-inner.bordeaux .sauternes {
+  left: 37.29%;
+  top: 79.02%;
+  width: 10.19%;
+  height: 3.24%;
+}
+
+.map-inner.bordeaux .bordeaux-superieur--bordeaux-ac {
+  left: 23.58%;
+  top: 87.58%;
+  width: 48.09%;
+  height: 5.03%;
+}
+
+.map-inner.bordeaux .arcachon-bay {
+  left: 9.33%;
+  top: 70.15%;
+  width: 12.74%;
+  height: 3.24%;
+}
+
+.map-inner.bordeaux .cotes-de-bourg--cotes-de-blaye {
+  left: 40.66%;
+  top: 26.42%;
+  width: 44.76%;
+  height: 5.03%;
+}
+
+.map-inner.bordeaux .pomerol {
+  left: 57.26%;
+  top: 41.49%;
+  width: 8.92%;
+  height: 2.78%;
+}
+
+.map-inner.bordeaux .fronsac {
+  left: 56.55%;
+  top: 45.60%;
+  width: 8.92%;
+  height: 2.78%;
+}
+
+.map-inner.bordeaux .saint-emilion {
+  left: 57.46%;
+  top: 52.23%;
+  width: 16.56%;
+  height: 3.24%;
+}
+
+.map-inner.bordeaux .entre-deux-mers {
+  left: 58.98%;
+  top: 63.68%;
+  width: 16.56%;
+  height: 3.24%;
+}
+
+
+@media (max-width: 720px) {
+  .wine-input {
+    grid-template-columns: 1fr;
+  }
+
+  .map {
+    min-height: 420px;
+  }
+
+  .map-inner {
+    min-height: 420px;
+  }
+
+  .map-inner .tile {
+    font-size: 0.85rem;
+  }
+}
