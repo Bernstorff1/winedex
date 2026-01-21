@@ -120,6 +120,21 @@ body::before {
   margin-bottom: 4px;
 }
 
+.panel-header-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.panel-header-row h2 {
+  margin: 0;
+}
+
+.next-btn {
+  white-space: nowrap;
+}
+
 .panel-header p {
   color: #4f3b2a;
 }
@@ -292,6 +307,46 @@ button.ghost {
   }
 }
 
+/* Mobile-locked layout (always show the phone view on desktop). */
+.app {
+  max-width: 420px !important;
+  padding: 28px 16px 48px !important;
+}
+
+.panel {
+  padding: 18px !important;
+}
+
+.panel-header h2 {
+  font-size: 1.3rem !important;
+}
+
+.wine-input {
+  grid-template-columns: 1fr !important;
+}
+
+.status {
+  align-items: flex-start !important;
+}
+
+#scoreText {
+  margin-left: 0 !important;
+}
+
+#nextBtn,
+#resetBtn {
+  width: 100% !important;
+}
+
+.map,
+.map-inner {
+  min-height: 260px !important;
+}
+
+.options {
+  grid-template-columns: 1fr !important;
+}
+
 .hidden {
   display: none;
 }
@@ -384,6 +439,54 @@ button.ghost {
   max-height: 100%;
 }
 
+.map-inner.usa {
+  background-image: url("usa-map.png");
+  background-size: contain;
+  background-repeat: no-repeat;
+  background-position: center;
+  aspect-ratio: 1600 / 1200;
+  height: 100%;
+  width: auto;
+  max-width: 100%;
+  max-height: 100%;
+}
+
+.map-inner.california {
+  background-image: url("california-map.png");
+  background-size: contain;
+  background-repeat: no-repeat;
+  background-position: center;
+  aspect-ratio: 1152 / 768;
+  height: 100%;
+  width: auto;
+  max-width: 100%;
+  max-height: 100%;
+}
+
+.map-inner.spain {
+  background-image: url("spain-map.png");
+  background-size: contain;
+  background-repeat: no-repeat;
+  background-position: center;
+  aspect-ratio: 600 / 475;
+  height: 100%;
+  width: auto;
+  max-width: 100%;
+  max-height: 100%;
+}
+
+.map-inner.ribera {
+  background-image: url("ribera-del-duero-map.png");
+  background-size: contain;
+  background-repeat: no-repeat;
+  background-position: center;
+  aspect-ratio: 694 / 517;
+  height: 100%;
+  width: auto;
+  max-width: 100%;
+  max-height: 100%;
+}
+
 .map-inner .tile {
   position: absolute;
   border-radius: 16px;
@@ -397,6 +500,13 @@ button.ghost {
   transition: transform 0.2s ease, background 0.2s ease, box-shadow 0.2s ease;
   box-shadow: 0 6px 16px rgba(26, 20, 17, 0.1);
   color: #24140f;
+  text-align: center;
+  line-height: 1.2;
+}
+
+.map-inner.world .tile {
+  font-size: 0.7rem;
+  padding: 4px 6px;
 }
 
 .tile:hover {
@@ -545,21 +655,24 @@ button.ghost {
 }
 
 .map-inner .france {
-  top: 29%;
-  left: 43%;
-  width: 86px;
+  left: 39.75%;
+  top: 30.82%;
+  width: 17.07%;
+  height: 6.92%;
 }
 
 .map-inner .italy {
-  top: 36%;
-  left: 49%;
-  width: 76px;
+  left: 47.70%;
+  top: 39.94%;
+  width: 13.71%;
+  height: 6.92%;
 }
 
 .map-inner .spain {
-  top: 36%;
-  left: 40%;
-  width: 86px;
+  left: 35.57%;
+  top: 38.98%;
+  width: 14.07%;
+  height: 6.92%;
 }
 
 .map-inner .germany {
@@ -569,39 +682,45 @@ button.ghost {
 }
 
 .map-inner .usa {
-  top: 30%;
-  left: 22%;
-  width: 118px;
+  left: 17.66%;
+  top: 36.90%;
+  width: 10.21%;
+  height: 6.91%;
 }
 
 .map-inner .argentina {
-  top: 75%;
-  left: 29%;
-  width: 110px;
+  left: 25.18%;
+  top: 58.45%;
+  width: 24.93%;
+  height: 6.92%;
 }
 
 .map-inner .chile {
-  top: 69%;
-  left: 26%;
-  width: 86px;
+  left: 18.58%;
+  top: 69.80%;
+  width: 12.57%;
+  height: 6.92%;
 }
 
 .map-inner .south-africa {
-  top: 73%;
-  left: 49%;
-  width: 116px;
+  left: 40.28%;
+  top: 70.78%;
+  width: 28.64%;
+  height: 6.92%;
 }
 
 .map-inner .australia {
-  top: 71%;
-  left: 70%;
-  width: 116px;
+  left: 63.95%;
+  top: 65.53%;
+  width: 23.64%;
+  height: 6.92%;
 }
 
 .map-inner .new-zealand {
-  top: 76%;
-  left: 80%;
-  width: 92px;
+  left: 82.66%;
+  top: 60.94%;
+  width: 20.79%;
+  height: 12.31%;
 }
 
 .map-inner.france .tile {
@@ -623,6 +742,67 @@ button.ghost {
   box-shadow: none;
   color: transparent;
   padding: 0;
+}
+
+.map-inner.world .hotspot {
+  background: transparent;
+  border: none;
+  box-shadow: none;
+  color: transparent;
+  padding: 0;
+}
+
+.map-inner.usa .hotspot {
+  background: transparent;
+  border: none;
+  box-shadow: none;
+  color: transparent;
+  padding: 0;
+}
+
+.map-inner.california .hotspot {
+  background: transparent;
+  border: none;
+  box-shadow: none;
+  color: transparent;
+  padding: 0;
+}
+
+.map-inner.spain .hotspot {
+  background: transparent;
+  border: none;
+  box-shadow: none;
+  color: transparent;
+  padding: 0;
+}
+
+.map-inner.ribera .hotspot {
+  background: transparent;
+  border: none;
+  box-shadow: none;
+  color: transparent;
+  padding: 0;
+}
+
+.map-inner.ribera .vest-valladolid {
+  left: 6.86%;
+  top: 52.39%;
+  width: 22.00%;
+  height: 8.00%;
+}
+
+.map-inner.ribera .central-peafiel-pesquera-valbuena-de-duero {
+  left: 36%;
+  top: 44%;
+  width: 38%;
+  height: 10%;
+}
+
+.map-inner.ribera .oest-soria-provinsen {
+  left: 70.29%;
+  top: 55.76%;
+  width: 26.00%;
+  height: 8.00%;
 }
 
 .map-inner.france .hotspot:focus-visible {
@@ -742,17 +922,17 @@ button.ghost {
 }
 
 .map-inner.bordeaux .sauternes {
-  left: 37.29%;
-  top: 79.02%;
+  left: 36.94%;
+  top: 76.99%;
   width: 10.19%;
   height: 3.24%;
 }
 
 .map-inner.bordeaux .bordeaux-superieur--bordeaux-ac {
-  left: 23.58%;
-  top: 87.58%;
+  left: 23.41%;
+  top: 84.47%;
   width: 48.09%;
-  height: 5.03%;
+  height: 5.02%;
 }
 
 .map-inner.bordeaux .arcachon-bay {
@@ -784,8 +964,8 @@ button.ghost {
 }
 
 .map-inner.bordeaux .saint-emilion {
-  left: 57.46%;
-  top: 52.23%;
+  left: 57.21%;
+  top: 52.78%;
   width: 16.56%;
   height: 3.24%;
 }
@@ -795,6 +975,194 @@ button.ghost {
   top: 63.68%;
   width: 16.56%;
   height: 3.24%;
+}
+
+.map-inner.usa .california {
+  left: 4.82%;
+  top: 52.46%;
+  width: 14.00%;
+  height: 6.00%;
+}
+
+.map-inner.usa .oregon {
+  left: 5.91%;
+  top: 37.36%;
+  width: 14.00%;
+  height: 6.00%;
+}
+
+.map-inner.usa .washington {
+  left: 30.00%;
+  top: 18.85%;
+  width: 14.00%;
+  height: 6.00%;
+}
+
+.map-inner.usa .texas {
+  left: 41.72%;
+  top: 89.98%;
+  width: 18.00%;
+  height: 6.00%;
+}
+
+.map-inner.usa .missouri {
+  left: 60.05%;
+  top: 84.84%;
+  width: 14.00%;
+  height: 6.00%;
+}
+
+.map-inner.usa .michigan {
+  left: 54.37%;
+  top: 29.43%;
+  width: 14.00%;
+  height: 6.00%;
+}
+
+.map-inner.usa .ohio {
+  left: 86.49%;
+  top: 51.49%;
+  width: 12.00%;
+  height: 6.00%;
+}
+
+.map-inner.usa .pennsylvania {
+  left: 86.13%;
+  top: 43.25%;
+  width: 16.00%;
+  height: 6.00%;
+}
+
+.map-inner.usa .new-york {
+  left: 71.07%;
+  top: 35.86%;
+  width: 14.00%;
+  height: 6.00%;
+}
+
+.map-inner.usa .virginia {
+  left: 86.46%;
+  top: 58.78%;
+  width: 14.00%;
+  height: 6.00%;
+}
+.map-inner.california .russian-river-valley {
+  left: 28%;
+  top: 30%;
+  width: 34%;
+  height: 16%;
+}
+
+.map-inner.california .north-coast {
+  left: 20%;
+  top: 18%;
+  width: 26%;
+  height: 10%;
+}
+
+.map-inner.california .central-coast {
+  left: 38.04%;
+  top: 78.67%;
+  width: 28.00%;
+  height: 10.00%;
+}
+
+.map-inner.california .lodi {
+  left: 46.55%;
+  top: 32.39%;
+  width: 18.00%;
+  height: 8.00%;
+}
+
+.map-inner.california .sierra-foothills {
+  left: 56.64%;
+  top: 44.28%;
+  width: 26.00%;
+  height: 10.00%;
+}
+
+.map-inner.spain .vinho-verde {
+  left: 1.37%;
+  top: 23.22%;
+  width: 14.00%;
+  height: 6.00%;
+}
+
+.map-inner.spain .douro {
+  left: 12.19%;
+  top: 30.03%;
+  width: 12.00%;
+  height: 6.00%;
+}
+
+.map-inner.spain .dao {
+  left: 9.71%;
+  top: 37.71%;
+  width: 10.00%;
+  height: 6.00%;
+}
+
+.map-inner.spain .alentejo {
+  left: 7.57%;
+  top: 69.46%;
+  width: 14.00%;
+  height: 6.00%;
+}
+
+.map-inner.spain .seville {
+  left: 29.42%;
+  top: 75.18%;
+  width: 10.00%;
+  height: 6.00%;
+}
+
+.map-inner.spain .jerez {
+  left: 28.37%;
+  top: 86.17%;
+  width: 8.00%;
+  height: 6.00%;
+}
+
+.map-inner.spain .la-mancha {
+  left: 41.12%;
+  top: 59.73%;
+  width: 18.00%;
+  height: 7.00%;
+}
+
+.map-inner.spain .ribera-del-duero {
+  left: 36.51%;
+  top: 26.02%;
+  width: 16.00%;
+  height: 6.00%;
+}
+
+.map-inner.spain .rueda {
+  left: 28.50%;
+  top: 34.08%;
+  width: 10.00%;
+  height: 6.00%;
+}
+
+.map-inner.spain .rioja {
+  left: 50.01%;
+  top: 16.15%;
+  width: 10.00%;
+  height: 6.00%;
+}
+
+.map-inner.spain .navarra {
+  left: 61.70%;
+  top: 16.93%;
+  width: 10.00%;
+  height: 6.00%;
+}
+
+.map-inner.spain .penedes {
+  left: 79.64%;
+  top: 28.25%;
+  width: 12.00%;
+  height: 6.00%;
 }
 
 

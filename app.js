@@ -1,13 +1,7 @@
 const regions = {
   France: {
     Bordeaux: {
-      "Haut-Medoc": {
-        "Alter Ego de Palmer": {},
-        "Chateau Pichon": {},
-        "Chateau Margaux": {},
-        "Chateau Palmer": {},
-        "Chateau Latour": {},
-      },
+      "Haut-Medoc": {},
       Medoc: {},
       "Pessac-Leognan": {},
       Graves: {},
@@ -55,12 +49,28 @@ const regions = {
         "Vina Ardanza": {},
       },
     },
+    "Ribera del Duero": {
+      "Vest (Valladolid)": {},
+      "Central (Peñafiel, Pesquera, Valbuena de Duero)": {},
+      "Øst (Soria-provinsen)": {},
+    },
+    Rueda: {},
+    "La Mancha": {},
+    Jerez: {},
+    Navarra: {},
+    Penedes: {},
+    "Vinho Verde": {},
+    Douro: {},
+    Dao: {},
+    Alentejo: {},
+    Seville: {},
   },
   USA: {
     California: {
-      Napa: {
-        Oakville: {},
-      },
+      "North Coast": {},
+      "Central Coast": {},
+      Lodi: {},
+      "Sierra Foothills": {},
     },
   },
   Argentina: {
@@ -106,35 +116,35 @@ const wines = [
     year: 2022,
     primaryGrape: "Cabernet Sauvignon",
     grapes: ["Cabernet Sauvignon", "Merlot", "Petit Verdot"],
-    path: ["France", "Bordeaux", "Haut-Medoc", "Alter Ego de Palmer"],
+    path: ["France", "Bordeaux", "Haut-Medoc"],
   },
   {
-    name: "Castello di Ama 2019",
-    year: 2019,
-    primaryGrape: "Sangiovese",
-    grapes: ["Sangiovese", "Merlot", "Cabernet Sauvignon"],
-    path: ["Italy", "Tuscany", "Chianti", "Castello di Ama"],
+    name: "Francis Coppola Director's Cut Pinot Noir Russian River Valley",
+    year: 2022,
+    primaryGrape: "Pinot Noir",
+    grapes: ["Pinot Noir"],
+    path: ["USA", "California", "North Coast"],
   },
   {
-    name: "Vina Ardanza Reserva 2015",
-    year: 2015,
-    primaryGrape: "Tempranillo",
-    grapes: ["Tempranillo", "Garnacha"],
-    path: ["Spain", "Rioja", "Rioja Alta", "Vina Ardanza"],
-  },
-  {
-    name: "Cloudy Bay Sauvignon Blanc",
+    name: "Vega Sicilia Bodegas Alion 2020",
     year: 2020,
-    primaryGrape: "Sauvignon Blanc",
-    grapes: ["Sauvignon Blanc"],
-    path: ["New Zealand", "Marlborough", "Wairau", "Cloudy Bay"],
+    primaryGrape: "Tempranillo",
+    grapes: ["Tempranillo"],
+    path: ["Spain", "Ribera del Duero", "Vest (Valladolid)"],
+  },
+  {
+    name: "Chateau Fombrauge 2000",
+    year: 2000,
+    primaryGrape: "Merlot",
+    grapes: ["Merlot", "Cabernet Franc", "Cabernet Sauvignon"],
+    path: ["France", "Bordeaux", "Saint-Emilion"],
   },
   {
     name: "Rust en Vrede 2018",
     year: 2018,
     primaryGrape: "Cabernet Sauvignon",
     grapes: ["Cabernet Sauvignon", "Shiraz", "Merlot"],
-    path: ["South Africa", "Stellenbosch", "Helderberg", "Rust en Vrede"],
+    path: ["South Africa", "Stellenbosch", "Helderberg"],
   },
 ];
 
@@ -186,8 +196,9 @@ const statusEl = document.getElementById("status");
 const statusText = document.getElementById("statusText");
 const scoreText = document.getElementById("scoreText");
 const stepHint = document.getElementById("stepHint");
-const nextBtn = document.getElementById("nextBtn");
-const resetBtn = document.getElementById("resetBtn");
+const nextBtnLocation = document.getElementById("nextBtnLocation");
+const nextBtnYear = document.getElementById("nextBtnYear");
+const nextBtnGrape = document.getElementById("nextBtnGrape");
 const mapControls = document.getElementById("mapControls");
 const zoomOutBtn = document.getElementById("zoomOut");
 const zoomInBtn = document.getElementById("zoomIn");
@@ -197,6 +208,7 @@ const debugPanel = document.getElementById("debugPanel");
 const debugOutput = document.getElementById("debugOutput");
 const finalPanel = document.getElementById("finalPanel");
 const finalText = document.getElementById("finalText");
+const finalRestart = document.getElementById("finalRestart");
 
 const countryOrder = Object.keys(regions);
 const franceMapRegions = [
@@ -225,6 +237,44 @@ const bordeauxMapRegions = [
   "Fronsac",
   "Saint-Emilion",
   "Entre-Deux-Mers",
+];
+
+const usaMapRegions = [
+  "California",
+  "Oregon",
+  "Washington",
+  "Michigan",
+  "New York",
+  "Pennsylvania",
+  "Ohio",
+  "Virginia",
+  "Missouri",
+  "Texas",
+];
+const spainMapRegions = [
+  "Vinho Verde",
+  "Douro",
+  "Dao",
+  "Alentejo",
+  "Seville",
+  "Jerez",
+  "La Mancha",
+  "Ribera del Duero",
+  "Rueda",
+  "Rioja",
+  "Navarra",
+  "Penedes",
+];
+const riberaMapRegions = [
+  "Vest (Valladolid)",
+  "Central (Peñafiel, Pesquera, Valbuena de Duero)",
+  "Øst (Soria-provinsen)",
+];
+const californiaMapRegions = [
+  "North Coast",
+  "Central Coast",
+  "Lodi",
+  "Sierra Foothills",
 ];
 
 const grapePoolsByCountry = {
@@ -265,6 +315,9 @@ const grapePoolsByCountry = {
 const slug = (value) =>
   value
     .toLowerCase()
+    .replace(/æ/g, "ae")
+    .replace(/ø/g, "oe")
+    .replace(/å/g, "aa")
     .replace(/\s+/g, "-")
     .replace(/[^a-z0-9-]/g, "");
 
@@ -278,6 +331,18 @@ const setStatus = (message, tone = "") => {
 
 const updateScore = () => {
   scoreText.textContent = `Score: ${state.score}`;
+};
+
+const setNextButtons = ({ location = false, year = false, grape = false } = {}) => {
+  if (nextBtnLocation) {
+    nextBtnLocation.classList.toggle("hidden", !location);
+  }
+  if (nextBtnYear) {
+    nextBtnYear.classList.toggle("hidden", !year);
+  }
+  if (nextBtnGrape) {
+    nextBtnGrape.classList.toggle("hidden", !grape);
+  }
 };
 
 const playTone = (type) => {
@@ -353,16 +418,24 @@ const showFinal = () => {
   const yearAnswer = renderYearAnswers();
   const grapeAnswer = renderGrapeAnswers();
   finalText.innerHTML = [
-    `Godt gaaet, du fik ${state.score} point.`,
+    `Godt gået, du fik ${state.score} point.`,
     `Sted: ${locationAnswer}`,
     `Aargang: ${yearAnswer}`,
-    `Primaer drue: ${grapeAnswer}`,
+    `Primær drue: ${grapeAnswer}`,
   ].join("<br />");
   setActivePanels({ wine: false, location: false, year: false, grape: false, final: true });
 };
 
 const setMapType = (type) => {
-  mapInner.classList.remove("world", "france", "bordeaux");
+  mapInner.classList.remove(
+    "world",
+    "france",
+    "bordeaux",
+    "usa",
+    "california",
+    "spain",
+    "ribera"
+  );
   mapInner.classList.add(type);
 };
 
@@ -391,17 +464,30 @@ const applyHotspotData = (el, data) => {
 
 const updateDebugOutput = () => {
   if (!selectedHotspot) {
-    debugOutput.textContent = "Vaelg en boks for at se koordinater.";
+    debugOutput.textContent = "Vælg en boks for at se koordinater.";
     return;
   }
   const data = getHotspotData(selectedHotspot);
   const label = selectedHotspot.getAttribute("aria-label") || "label";
   const slugLabel = slug(label);
+  const mapType = mapInner.classList.contains("bordeaux")
+    ? "bordeaux"
+    : mapInner.classList.contains("france")
+      ? "france"
+      : mapInner.classList.contains("california")
+        ? "california"
+          : mapInner.classList.contains("usa")
+          ? "usa"
+          : mapInner.classList.contains("spain")
+            ? "spain"
+            : mapInner.classList.contains("ribera")
+              ? "ribera"
+              : "world";
   debugOutput.textContent = [
     `${label}`,
     `left: ${formatPercent(data.left)}; top: ${formatPercent(data.top)};`,
     `width: ${formatPercent(data.width)}; height: ${formatPercent(data.height)};`,
-    `.map-inner.${mapInner.classList.contains("bordeaux") ? "bordeaux" : "france"} .${slugLabel} {`,
+    `.map-inner.${mapType} .${slugLabel} {`,
     `  left: ${formatPercent(data.left)};`,
     `  top: ${formatPercent(data.top)};`,
     `  width: ${formatPercent(data.width)};`,
@@ -480,16 +566,15 @@ const resetGame = () => {
   grapeHelp.textContent = "";
   grapeDoneHint.classList.add("hidden");
   finalText.textContent = "";
-  setStatus("Venter paa vin.");
+  setStatus("Venter på vin.");
   updateScore();
-  stepHint.textContent = "Start med landet paa verdenskortet.";
+  stepHint.textContent = "Start med landet på verdenskortet.";
   optionsEl.innerHTML = "";
   mapEl.classList.add("hidden");
   mapControls.classList.add("hidden");
   optionsEl.classList.add("hidden");
   yearPanel.classList.add("hidden");
-  resetBtn.classList.add("hidden");
-  nextBtn.classList.add("hidden");
+  setNextButtons();
   updateZoom();
   setMapType("world");
   renderMapItems(countryOrder);
@@ -501,7 +586,16 @@ const renderSamples = () => {
     const chip = document.createElement("button");
     chip.type = "button";
     chip.className = "sample";
-    const alias = wine.name === "Alter Ego de Palmer 2022" ? "Allers Vin" : null;
+    const alias =
+      wine.name === "Alter Ego de Palmer 2022"
+        ? "Allers Vin"
+        : wine.name === "Francis Coppola Director's Cut Pinot Noir Russian River Valley"
+          ? "Simons Vin"
+          : wine.name === "Vega Sicilia Bodegas Alion 2020"
+            ? "Magnus Vin"
+            : wine.name === "Chateau Fombrauge 2000"
+              ? "Axels Vin"
+            : null;
     chip.textContent = alias || wine.name;
     chip.addEventListener("click", () => {
       wineInput.value = alias || wine.name;
@@ -529,6 +623,11 @@ const renderMapItems = (items, { showLabels = true } = {}) => {
     tile.addEventListener("click", () => handleSelection(label));
     mapInner.appendChild(tile);
   });
+};
+
+const renderWorldMap = () => {
+  const showLabels = !mapInner.classList.contains("debug");
+  renderMapItems(countryOrder, { showLabels });
 };
 
 const updateZoom = () => {
@@ -586,7 +685,7 @@ const renderStep = () => {
 
   if (state.phase === "year") {
     locationPanel.classList.add("minimized");
-    locationDoneHint.textContent = "2. Vaelg sted er faerdig.";
+    locationDoneHint.textContent = "2. Vælg sted er færdig.";
     locationDoneHint.classList.remove("hidden");
     mapEl.classList.add("hidden");
     mapControls.classList.add("hidden");
@@ -600,8 +699,8 @@ const renderStep = () => {
     const range = ranges[state.yearStep] ?? 0;
     yearHint.textContent =
       range === 0
-        ? "Gaet det praecise aarstal."
-        : `Gaet inden for ${range} aar.`;
+        ? "Gæt det præcise årstal."
+        : `Gæt inden for ${range} år.`;
     const minYear = 1980;
     const maxYear = 2026;
     state.yearSpan = range === 0 ? 0 : Math.round(range / 2);
@@ -611,9 +710,8 @@ const renderStep = () => {
     yearMin.textContent = String(minYear);
     yearMax.textContent = String(maxYear);
     updateYearBubble();
-    setStatus("Gaet aargang.");
-    resetBtn.classList.remove("hidden");
-    nextBtn.classList.remove("hidden");
+    setStatus("Gæt årgang.");
+    setNextButtons({ year: true });
     updateDebugOutput();
     return;
   }
@@ -626,7 +724,7 @@ const renderStep = () => {
 
   if (state.phase === "grape") {
     locationPanel.classList.add("minimized");
-    locationDoneHint.textContent = "2. Vaelg sted er faerdig.";
+    locationDoneHint.textContent = "2. Vælg sted er færdig.";
     locationDoneHint.classList.remove("hidden");
     mapEl.classList.add("hidden");
     mapControls.classList.add("hidden");
@@ -636,9 +734,8 @@ const renderStep = () => {
     grapeDoneHint.classList.add("hidden");
     grapeHelp.textContent = "";
     renderGrapeOptions();
-    setStatus("Gaet primaer drue.");
-    resetBtn.classList.remove("hidden");
-    nextBtn.classList.remove("hidden");
+    setStatus("Gæt primær drue.");
+    setNextButtons({ grape: true });
     updateDebugOutput();
     finalPanel.classList.add("hidden");
     return;
@@ -647,14 +744,50 @@ const renderStep = () => {
   grapePanel.classList.add("hidden");
 
   if (state.step === 0) {
-    stepHint.textContent = "Klik paa landet paa verdenskortet.";
+    stepHint.textContent = "Klik på landet på verdenskortet.";
     setMapType("world");
-    renderMapItems(countryOrder);
+    renderWorldMap();
+    mapEl.classList.remove("hidden");
+    mapControls.classList.remove("hidden");
+    optionsEl.classList.add("hidden");
+  } else if (state.step === 1 && state.wine.path[0] === "USA") {
+    stepHint.textContent = "Vælg det korrekte amerikanske område.";
+    setMapType("usa");
+    renderMapItems(usaMapRegions, { showLabels: false });
+    mapEl.classList.remove("hidden");
+    mapControls.classList.remove("hidden");
+    optionsEl.classList.add("hidden");
+  } else if (state.step === 1 && state.wine.path[0] === "Spain") {
+    stepHint.textContent = "Vælg det korrekte spanske område.";
+    setMapType("spain");
+    renderMapItems(spainMapRegions, { showLabels: false });
+    mapEl.classList.remove("hidden");
+    mapControls.classList.remove("hidden");
+    optionsEl.classList.add("hidden");
+  } else if (
+    state.step === 2 &&
+    state.wine.path[0] === "Spain" &&
+    state.wine.path[1] === "Ribera del Duero"
+  ) {
+    stepHint.textContent = "Vælg korrekt Ribera del Duero-område.";
+    setMapType("ribera");
+    renderMapItems(riberaMapRegions, { showLabels: false });
+    mapEl.classList.remove("hidden");
+    mapControls.classList.remove("hidden");
+    optionsEl.classList.add("hidden");
+  } else if (
+    state.step === 2 &&
+    state.wine.path[0] === "USA" &&
+    state.wine.path[1] === "California"
+  ) {
+    stepHint.textContent = "Vælg korrekt underområde.";
+    setMapType("california");
+    renderMapItems(californiaMapRegions, { showLabels: false });
     mapEl.classList.remove("hidden");
     mapControls.classList.remove("hidden");
     optionsEl.classList.add("hidden");
   } else if (state.step === 1 && state.wine.path[0] === "France") {
-    stepHint.textContent = "Vaelg det korrekte franske omraade.";
+    stepHint.textContent = "Vælg det korrekte franske område.";
     setMapType("france");
     renderMapItems(franceMapRegions, { showLabels: false });
     mapEl.classList.remove("hidden");
@@ -665,25 +798,23 @@ const renderStep = () => {
     state.wine.path[0] === "France" &&
     state.wine.path[1] === "Bordeaux"
   ) {
-    stepHint.textContent = "Vaelg det korrekte Bordeaux-omraade.";
+    stepHint.textContent = "Vælg det korrekte Bordeaux-område.";
     setMapType("bordeaux");
     renderMapItems(bordeauxMapRegions, { showLabels: false });
     mapEl.classList.remove("hidden");
     mapControls.classList.remove("hidden");
     optionsEl.classList.add("hidden");
   } else {
-    const labels = ["land", "omraade", "subomraade", "mark"];
+    const labels = ["land", "område", "subområde", "mark"];
     const label = labels[state.step] || "sted";
-    stepHint.textContent = `Vaelg korrekt ${label}.`;
+    stepHint.textContent = `Vælg korrekt ${label}.`;
     mapEl.classList.add("hidden");
     mapControls.classList.add("hidden");
-    optionsEl.classList.remove("hidden");
-    renderOptions();
+    optionsEl.classList.add("hidden");
   }
 
-  setStatus("Gaet vinens oprindelse.");
-  resetBtn.classList.remove("hidden");
-  nextBtn.classList.remove("hidden");
+  setStatus("Gæt vinens oprindelse.");
+  setNextButtons({ location: true });
   updateDebugOutput();
 };
 
@@ -694,24 +825,22 @@ const skipStep = () => {
     state.phase = "year";
     state.yearStep = 0;
     state.answers.locationSkipped = true;
-    state.answers.location = [];
-    setStatus("Springer til aargang.");
+    setStatus("Springer til årgang.");
     renderStep();
     return;
   }
   if (state.phase === "year") {
     state.phase = "grape";
     state.answers.yearSkipped = true;
-    state.answers.year = [];
     setStatus("Springer til drue.");
     renderStep();
     return;
   }
-  setStatus("Springer videre - faerdig.");
-  stepHint.textContent = "Fuldfort - nulstil for at proeve en ny vin.";
+  setStatus("Springer videre - færdig.");
+  stepHint.textContent = "Fuldført - nulstil for at prøve en ny vin.";
   grapePanel.classList.remove("hidden");
   grapePanel.classList.add("minimized");
-  grapeDoneHint.textContent = "4. Primaer drue er faerdig.";
+  grapeDoneHint.textContent = "4. Primær drue er færdig.";
   grapeDoneHint.classList.remove("hidden");
   state.answers.grapeSkipped = true;
   showFinal();
@@ -723,7 +852,7 @@ const handleGrapeSelection = (selection) => {
     state.score -= 1;
     updateScore();
     state.answers.grape.push({ value: selection, correct: false });
-    setStatus("Forkert drue - proev igen.", "error");
+    setStatus("Forkert drue - prøv igen.", "error");
     playTone("error");
     return;
   }
@@ -732,7 +861,7 @@ const handleGrapeSelection = (selection) => {
   playTone("success");
   setStatus("Korrekt drue!", "success");
   grapePanel.classList.add("minimized");
-  grapeDoneHint.textContent = "4. Primaer drue er faerdig.";
+  grapeDoneHint.textContent = "4. Primær drue er færdig.";
   grapeDoneHint.classList.remove("hidden");
   state.answers.grape.push({ value: selection, correct: true });
   showFinal();
@@ -746,7 +875,7 @@ const handleSelection = (selection) => {
     state.score -= 1;
     updateScore();
     state.answers.location.push({ value: selection, correct: false });
-    setStatus("Forkert valg - proev igen.", "error");
+    setStatus("Forkert valg - prøv igen.", "error");
     playTone("error");
     return;
   }
@@ -758,8 +887,8 @@ const handleSelection = (selection) => {
   playTone("success");
 
   if (state.step >= state.wine.path.length) {
-    setStatus("Korrekt - videre til aargang!", "success");
-    stepHint.textContent = "Gaet aargang.";
+    setStatus("Korrekt - videre til årgang!", "success");
+    stepHint.textContent = "Gæt årgang.";
     state.phase = "year";
     state.yearStep = 0;
     renderStep();
@@ -775,14 +904,27 @@ const findWine = (input) => {
   if (normalized === "allers vin") {
     return wines.find((wine) => wine.name === "Alter Ego de Palmer 2022") || null;
   }
+  if (normalized === "simons vin") {
+    return (
+      wines.find(
+        (wine) => wine.name === "Francis Coppola Director's Cut Pinot Noir Russian River Valley"
+      ) || null
+    );
+  }
+  if (normalized === "magnus vin") {
+    return wines.find((wine) => wine.name === "Vega Sicilia Bodegas Alion 2020") || null;
+  }
+  if (normalized === "axels vin") {
+    return wines.find((wine) => wine.name === "Chateau Fombrauge 2000") || null;
+  }
   return wines.find((wine) => wine.name.toLowerCase() === normalized) || null;
 };
 
 startBtn.addEventListener("click", () => {
   const selected = findWine(wineInput.value);
   if (!selected) {
-    wineHelp.textContent = "Fandt ikke vinen. Proev en af eksemplerne herunder.";
-    setStatus("Venter paa korrekt vin.");
+    wineHelp.textContent = "Fandt ikke vinen. Prøv en af eksemplerne herunder.";
+    setStatus("Venter på korrekt vin.");
     return;
   }
   wineHelp.textContent = "";
@@ -804,8 +946,10 @@ startBtn.addEventListener("click", () => {
   renderStep();
 });
 
-resetBtn.addEventListener("click", resetGame);
-nextBtn.addEventListener("click", skipStep);
+finalRestart.addEventListener("click", resetGame);
+nextBtnLocation.addEventListener("click", skipStep);
+nextBtnYear.addEventListener("click", skipStep);
+nextBtnGrape.addEventListener("click", skipStep);
 yearInput.addEventListener("input", () => {
   updateYearBubble();
 });
@@ -814,7 +958,7 @@ yearSubmit.addEventListener("click", () => {
   if (!state.wine) return;
   const yearValue = Number(yearInput.value);
   if (!Number.isFinite(yearValue)) {
-    yearHelp.textContent = "Skriv et gyldigt aarstal.";
+    yearHelp.textContent = "Skriv et gyldigt årstal.";
     return;
   }
   yearHelp.textContent = "";
@@ -827,11 +971,11 @@ yearSubmit.addEventListener("click", () => {
     state.score -= 1;
     updateScore();
     if (range === 0) {
-      state.answers.year.push({ value: `praecist: ${yearValue}`, correct: false });
+      state.answers.year.push({ value: `præcist: ${yearValue}`, correct: false });
     } else {
       state.answers.year.push({ value: `inden for ${range}: ${yearValue}`, correct: false });
     }
-    setStatus("Forkert - proev igen.", "error");
+    setStatus("Forkert - prøv igen.", "error");
     playTone("error");
     return;
   }
@@ -840,14 +984,14 @@ yearSubmit.addEventListener("click", () => {
   playTone("success");
   state.lastYearGuess = yearValue;
   if (range === 0) {
-    state.answers.year.push({ value: `praecist: ${yearValue}`, correct: true });
+    state.answers.year.push({ value: `præcist: ${yearValue}`, correct: true });
   } else {
     state.answers.year.push({ value: `inden for ${range}: ${yearValue}`, correct: true });
   }
   state.yearStep += 1;
   if (state.yearStep >= ranges.length) {
-    setStatus("Korrekt! Du ramte aargangen.", "success");
-    stepHint.textContent = "Fuldfort - nulstil for at proeve en ny vin.";
+    setStatus("Korrekt! Du ramte årgangen.", "success");
+    stepHint.textContent = "Fuldført - nulstil for at prøve en ny vin.";
     state.phase = "grape";
     renderStep();
     return;
@@ -867,6 +1011,9 @@ zoomInBtn.addEventListener("click", () => {
 debugToggle.addEventListener("click", () => {
   mapInner.classList.toggle("debug");
   debugPanel.classList.toggle("hidden", !mapInner.classList.contains("debug"));
+  if (mapInner.classList.contains("world") && state.phase === "location" && state.step === 0) {
+    renderWorldMap();
+  }
   updateDebugOutput();
 });
 

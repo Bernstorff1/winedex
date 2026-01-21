@@ -18,11 +18,11 @@
         <p class="eyebrow">Blindsmagning</p>
         <h1>Find vinens oprindelse</h1>
         <p class="lede">
-          Skriv vinen ind, og gaet dig frem gennem land, omraade og mark.
+          Skriv vinen ind, og gæt dig frem gennem land, område og mark.
         </p>
       </header>
 
-      <section class="panel" id="winePanel" aria-label="Vaelg vin">
+      <section class="panel" id="winePanel" aria-label="Vælg vin">
         <div class="panel-header">
           <h2>1. Hvilken vin smages?</h2>
           <p>Skriv navnet, og start rejsen.</p>
@@ -39,19 +39,21 @@
         <div class="status" id="status">
           <span id="statusText"></span>
           <span id="scoreText"></span>
-          <button id="nextBtn" type="button" class="ghost hidden">Naeste</button>
-          <button id="resetBtn" type="button" class="ghost hidden">Nulstil</button>
         </div>
       </section>
 
       <section class="panel hidden" id="finalPanel">
         <p id="finalText"></p>
+        <button id="finalRestart" type="button" class="ghost">Til forsiden</button>
       </section>
 
       <section class="panel location-panel" id="locationPanel" aria-live="polite">
         <div class="panel-header">
-          <h2>2. Vaelg sted</h2>
-          <p id="stepHint">Start med landet paa verdenskortet.</p>
+          <div class="panel-header-row">
+            <h2>2. Vælg sted</h2>
+            <button id="nextBtnLocation" type="button" class="ghost next-btn hidden">Næste</button>
+          </div>
+          <p id="stepHint">Start med landet på verdenskortet.</p>
           <p class="helper" id="locationScoreHint">Rigtigt: +3 point. Forkert: -1 point.</p>
           <p class="helper hidden done-hint" id="locationDoneHint"></p>
         </div>
@@ -63,7 +65,7 @@
             <button id="debugToggle" type="button" class="ghost">Debug</button>
           </div>
           <div class="debug-panel hidden" id="debugPanel">
-            <p><strong>Debug:</strong> Klik en boks og brug piletaster til at flytte. Shift + piletaster justerer stoerrelse.</p>
+            <p><strong>Debug:</strong> Klik en boks og brug piletaster til at flytte. Shift + piletaster justerer størrelse.</p>
             <pre id="debugOutput"></pre>
           </div>
           <div class="map" id="map">
@@ -75,7 +77,10 @@
 
       <section class="panel year-panel hidden" id="yearPanel">
         <div class="panel-header">
-          <h2>3. Gaet aargang</h2>
+          <div class="panel-header-row">
+            <h2>3. Gæt årgang</h2>
+            <button id="nextBtnYear" type="button" class="ghost next-btn hidden">Næste</button>
+          </div>
           <p class="helper" id="yearScoreHint">Rigtigt: +3 point. Forkert: -1 point.</p>
           <p id="yearDoneHint" class="helper hidden done-hint"></p>
         </div>
@@ -98,7 +103,10 @@
 
       <section class="panel grape-panel hidden" id="grapePanel">
         <div class="panel-header">
-          <h2>4. Gaet primaer drue</h2>
+          <div class="panel-header-row">
+            <h2>4. Gæt primær drue</h2>
+            <button id="nextBtnGrape" type="button" class="ghost next-btn hidden">Næste</button>
+          </div>
           <p class="helper" id="grapeScoreHint">Rigtigt: +3 point. Forkert: -1 point.</p>
           <p id="grapeDoneHint" class="helper hidden done-hint"></p>
         </div>
@@ -110,7 +118,7 @@
 
       <footer class="panel footer">
         <p>
-          Tip: Tilfoej flere vine og omraader i <span class="mono">app.js</span>.
+          Tip: Tilføj flere vine og områder i <span class="mono">app.js</span>.
         </p>
       </footer>
     </main>
