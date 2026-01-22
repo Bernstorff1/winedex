@@ -140,11 +140,11 @@ const wines = [
     path: ["France", "Bordeaux", "Saint-Emilion"],
   },
   {
-    name: "Rust en Vrede 2018",
-    year: 2018,
-    primaryGrape: "Cabernet Sauvignon",
-    grapes: ["Cabernet Sauvignon", "Shiraz", "Merlot"],
-    path: ["South Africa", "Stellenbosch", "Helderberg"],
+    name: "Flor de Pingus 2016",
+    year: 2016,
+    primaryGrape: "Tempranillo",
+    grapes: ["Tempranillo"],
+    path: ["Spain", "Ribera del Duero", "Vest (Valladolid)"],
   },
 ];
 
@@ -176,6 +176,7 @@ const locationPanel = document.getElementById("locationPanel");
 const locationDoneHint = document.getElementById("locationDoneHint");
 const mapEl = document.getElementById("map");
 const mapInner = document.getElementById("mapInner");
+const mapNote = document.getElementById("mapNote");
 const optionsEl = document.getElementById("options");
 const yearPanel = document.getElementById("yearPanel");
 const yearHint = document.getElementById("yearHint");
@@ -203,9 +204,6 @@ const mapControls = document.getElementById("mapControls");
 const zoomOutBtn = document.getElementById("zoomOut");
 const zoomInBtn = document.getElementById("zoomIn");
 const zoomLabel = document.getElementById("zoomLabel");
-const debugToggle = document.getElementById("debugToggle");
-const debugPanel = document.getElementById("debugPanel");
-const debugOutput = document.getElementById("debugOutput");
 const finalPanel = document.getElementById("finalPanel");
 const finalText = document.getElementById("finalText");
 const finalRestart = document.getElementById("finalRestart");
@@ -333,6 +331,21 @@ const updateScore = () => {
   scoreText.textContent = `Score: ${state.score}`;
 };
 
+const flashChoice = (el, isCorrect) => {
+  if (!el) return;
+  el.classList.remove("choice-correct", "choice-wrong", "choice-shake");
+  // Force reflow so the animation always restarts.
+  void el.offsetWidth;
+  if (isCorrect) {
+    el.classList.add("choice-correct");
+  } else {
+    el.classList.add("choice-wrong", "choice-shake");
+  }
+  window.setTimeout(() => {
+    el.classList.remove("choice-correct", "choice-wrong", "choice-shake");
+  }, 700);
+};
+
 const setNextButtons = ({ location = false, year = false, grape = false } = {}) => {
   if (nextBtnLocation) {
     nextBtnLocation.classList.toggle("hidden", !location);
@@ -342,6 +355,17 @@ const setNextButtons = ({ location = false, year = false, grape = false } = {}) 
   }
   if (nextBtnGrape) {
     nextBtnGrape.classList.toggle("hidden", !grape);
+  }
+};
+
+const setMapNote = (text) => {
+  if (!mapNote) return;
+  if (text) {
+    mapNote.textContent = text;
+    mapNote.classList.remove("hidden");
+  } else {
+    mapNote.textContent = "";
+    mapNote.classList.add("hidden");
   }
 };
 
@@ -462,39 +486,7 @@ const applyHotspotData = (el, data) => {
   el.style.height = formatPercent(data.height);
 };
 
-const updateDebugOutput = () => {
-  if (!selectedHotspot) {
-    debugOutput.textContent = "Vælg en boks for at se koordinater.";
-    return;
-  }
-  const data = getHotspotData(selectedHotspot);
-  const label = selectedHotspot.getAttribute("aria-label") || "label";
-  const slugLabel = slug(label);
-  const mapType = mapInner.classList.contains("bordeaux")
-    ? "bordeaux"
-    : mapInner.classList.contains("france")
-      ? "france"
-      : mapInner.classList.contains("california")
-        ? "california"
-          : mapInner.classList.contains("usa")
-          ? "usa"
-          : mapInner.classList.contains("spain")
-            ? "spain"
-            : mapInner.classList.contains("ribera")
-              ? "ribera"
-              : "world";
-  debugOutput.textContent = [
-    `${label}`,
-    `left: ${formatPercent(data.left)}; top: ${formatPercent(data.top)};`,
-    `width: ${formatPercent(data.width)}; height: ${formatPercent(data.height)};`,
-    `.map-inner.${mapType} .${slugLabel} {`,
-    `  left: ${formatPercent(data.left)};`,
-    `  top: ${formatPercent(data.top)};`,
-    `  width: ${formatPercent(data.width)};`,
-    `  height: ${formatPercent(data.height)};`,
-    `}`,
-  ].join("\n");
-};
+const updateDebugOutput = () => {};
 
 const shuffle = (items) => {
   const copy = [...items];
@@ -531,7 +523,7 @@ const renderGrapeOptions = () => {
     btn.type = "button";
     btn.className = "option-btn";
     btn.textContent = grape;
-    btn.addEventListener("click", () => handleGrapeSelection(grape));
+    btn.addEventListener("click", () => handleGrapeSelection(grape, btn));
     grapeOptions.appendChild(btn);
   });
 };
@@ -595,6 +587,8 @@ const renderSamples = () => {
             ? "Magnus Vin"
             : wine.name === "Chateau Fombrauge 2000"
               ? "Axels Vin"
+              : wine.name === "Flor de Pingus 2016"
+                ? "Kaares Vin"
             : null;
     chip.textContent = alias || wine.name;
     chip.addEventListener("click", () => {
@@ -620,7 +614,7 @@ const renderMapItems = (items, { showLabels = true } = {}) => {
       tile.dataset.label = label;
       tile.textContent = "";
     }
-    tile.addEventListener("click", () => handleSelection(label));
+    tile.addEventListener("click", () => handleSelection(label, tile));
     mapInner.appendChild(tile);
   });
 };
@@ -655,7 +649,7 @@ const renderOptions = () => {
     btn.type = "button";
     btn.className = "option-btn";
     btn.textContent = option;
-    btn.addEventListener("click", () => handleSelection(option));
+    btn.addEventListener("click", () => handleSelection(option, btn));
     optionsEl.appendChild(btn);
   });
 };
@@ -682,6 +676,8 @@ const renderStep = () => {
     resetGame();
     return;
   }
+
+  setMapNote("");
 
   if (state.phase === "year") {
     locationPanel.classList.add("minimized");
@@ -770,6 +766,7 @@ const renderStep = () => {
     state.wine.path[1] === "Ribera del Duero"
   ) {
     stepHint.textContent = "Vælg korrekt Ribera del Duero-område.";
+    setMapNote("Vælg mellem vest, central eller øst.");
     setMapType("ribera");
     renderMapItems(riberaMapRegions, { showLabels: false });
     mapEl.classList.remove("hidden");
@@ -846,18 +843,20 @@ const skipStep = () => {
   showFinal();
 };
 
-const handleGrapeSelection = (selection) => {
+const handleGrapeSelection = (selection, sourceEl) => {
   if (!state.wine) return;
   if (selection !== state.wine.primaryGrape) {
     state.score -= 1;
     updateScore();
     state.answers.grape.push({ value: selection, correct: false });
+    flashChoice(sourceEl, false);
     setStatus("Forkert drue - prøv igen.", "error");
     playTone("error");
     return;
   }
   state.score += 3;
   updateScore();
+  flashChoice(sourceEl, true);
   playTone("success");
   setStatus("Korrekt drue!", "success");
   grapePanel.classList.add("minimized");
@@ -867,13 +866,14 @@ const handleGrapeSelection = (selection) => {
   showFinal();
 };
 
-const handleSelection = (selection) => {
+const handleSelection = (selection, sourceEl) => {
   if (!state.wine) return;
   const expected = state.wine.path[state.step];
 
   if (selection !== expected) {
     state.score -= 1;
     updateScore();
+    flashChoice(sourceEl, false);
     state.answers.location.push({ value: selection, correct: false });
     setStatus("Forkert valg - prøv igen.", "error");
     playTone("error");
@@ -883,6 +883,7 @@ const handleSelection = (selection) => {
   state.step += 1;
   state.score += 3;
   updateScore();
+  flashChoice(sourceEl, true);
   state.answers.location.push({ value: selection, correct: true });
   playTone("success");
 
@@ -916,6 +917,9 @@ const findWine = (input) => {
   }
   if (normalized === "axels vin") {
     return wines.find((wine) => wine.name === "Chateau Fombrauge 2000") || null;
+  }
+  if (normalized === "kaaeres vin" || normalized === "kaares vin") {
+    return wines.find((wine) => wine.name === "Flor de Pingus 2016") || null;
   }
   return wines.find((wine) => wine.name.toLowerCase() === normalized) || null;
 };
@@ -970,6 +974,7 @@ yearSubmit.addEventListener("click", () => {
   if (!correct) {
     state.score -= 1;
     updateScore();
+    flashChoice(yearSubmit, false);
     if (range === 0) {
       state.answers.year.push({ value: `præcist: ${yearValue}`, correct: false });
     } else {
@@ -981,6 +986,7 @@ yearSubmit.addEventListener("click", () => {
   }
   state.score += 3;
   updateScore();
+  flashChoice(yearSubmit, true);
   playTone("success");
   state.lastYearGuess = yearValue;
   if (range === 0) {
@@ -1008,116 +1014,5 @@ zoomInBtn.addEventListener("click", () => {
   state.zoom = Math.min(2, +(state.zoom + 0.1).toFixed(2));
   updateZoom();
 });
-debugToggle.addEventListener("click", () => {
-  mapInner.classList.toggle("debug");
-  debugPanel.classList.toggle("hidden", !mapInner.classList.contains("debug"));
-  if (mapInner.classList.contains("world") && state.phase === "location" && state.step === 0) {
-    renderWorldMap();
-  }
-  updateDebugOutput();
-});
-
-mapInner.addEventListener("click", (event) => {
-  if (!mapInner.classList.contains("debug")) return;
-  const target = event.target.closest(".hotspot");
-  if (!target) return;
-  if (selectedHotspot) selectedHotspot.classList.remove("selected");
-  selectedHotspot = target;
-  selectedHotspot.classList.add("selected");
-  updateDebugOutput();
-});
-
-mapInner.addEventListener("pointerdown", (event) => {
-  if (!mapInner.classList.contains("debug")) return;
-  const target = event.target.closest(".hotspot");
-  if (!target) return;
-  event.preventDefault();
-  if (selectedHotspot && selectedHotspot !== target) {
-    selectedHotspot.classList.remove("selected");
-  }
-  selectedHotspot = target;
-  selectedHotspot.classList.add("selected");
-  const rect = target.getBoundingClientRect();
-  dragOffset = { x: event.clientX - rect.left, y: event.clientY - rect.top };
-  isDragging = true;
-  target.setPointerCapture(event.pointerId);
-});
-
-mapInner.addEventListener("pointermove", (event) => {
-  if (!isDragging || !selectedHotspot) return;
-  const rect = mapInner.getBoundingClientRect();
-  const width = selectedHotspot.getBoundingClientRect().width;
-  const height = selectedHotspot.getBoundingClientRect().height;
-  const leftPx = event.clientX - rect.left - dragOffset.x;
-  const topPx = event.clientY - rect.top - dragOffset.y;
-  const data = {
-    left: (leftPx / rect.width) * 100,
-    top: (topPx / rect.height) * 100,
-    width: (width / rect.width) * 100,
-    height: (height / rect.height) * 100,
-  };
-  applyHotspotData(selectedHotspot, data);
-  updateDebugOutput();
-});
-
-mapInner.addEventListener("pointerup", (event) => {
-  if (!isDragging) return;
-  isDragging = false;
-  if (selectedHotspot) selectedHotspot.releasePointerCapture(event.pointerId);
-});
-
-document.addEventListener("keydown", (event) => {
-  if (!mapInner.classList.contains("debug") || !selectedHotspot) return;
-  const step = event.shiftKey ? 1 : 0.5;
-  const sizeStep = event.shiftKey ? 0.5 : 0;
-  const data = getHotspotData(selectedHotspot);
-  let changed = false;
-
-  switch (event.key) {
-    case "ArrowUp":
-      if (event.shiftKey) {
-        data.height = Math.max(1, data.height - sizeStep);
-      } else {
-        data.top = data.top - step;
-      }
-      changed = true;
-      break;
-    case "ArrowDown":
-      if (event.shiftKey) {
-        data.height = data.height + sizeStep;
-      } else {
-        data.top = data.top + step;
-      }
-      changed = true;
-      break;
-    case "ArrowLeft":
-      if (event.shiftKey) {
-        data.width = Math.max(1, data.width - sizeStep);
-      } else {
-        data.left = data.left - step;
-      }
-      changed = true;
-      break;
-    case "ArrowRight":
-      if (event.shiftKey) {
-        data.width = data.width + sizeStep;
-      } else {
-        data.left = data.left + step;
-      }
-      changed = true;
-      break;
-    default:
-      break;
-  }
-
-  if (changed) {
-    event.preventDefault();
-    applyHotspotData(selectedHotspot, data);
-    updateDebugOutput();
-  }
-});
-
 renderSamples();
-mapInner.classList.add("debug");
-debugPanel.classList.remove("hidden");
 resetGame();
