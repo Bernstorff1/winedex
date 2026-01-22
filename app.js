@@ -167,9 +167,6 @@ const state = {
   },
 };
 
-const wineInput = document.getElementById("wineInput");
-const startBtn = document.getElementById("startBtn");
-const wineHelp = document.getElementById("wineHelp");
 const sampleList = document.getElementById("sampleList");
 const winePanel = document.getElementById("winePanel");
 const locationPanel = document.getElementById("locationPanel");
@@ -545,8 +542,6 @@ const resetGame = () => {
   };
   state.lastYearGuess = 2003;
   state.lastYearGuess = 2003;
-  wineInput.value = "";
-  wineHelp.textContent = "";
   yearInput.value = "";
   yearHelp.textContent = "";
   setActivePanels({ wine: true, location: false, year: false, grape: false, final: false });
@@ -572,6 +567,25 @@ const resetGame = () => {
   renderMapItems(countryOrder);
 };
 
+const startWine = (selected) => {
+  state.wine = selected;
+  state.step = 0;
+  state.phase = "location";
+  state.yearStep = 0;
+  setActivePanels({ wine: false, location: true, year: false, grape: false, final: false });
+  state.answers = {
+    location: [],
+    year: [],
+    grape: [],
+    locationSkipped: false,
+    yearSkipped: false,
+    grapeSkipped: false,
+  };
+  winePanel.classList.add("hidden");
+  setStatus("Vin valgt - find landet.");
+  renderStep();
+};
+
 const renderSamples = () => {
   sampleList.innerHTML = "";
   wines.forEach((wine) => {
@@ -591,10 +605,7 @@ const renderSamples = () => {
                 ? "Kaares Vin"
             : null;
     chip.textContent = alias || wine.name;
-    chip.addEventListener("click", () => {
-      wineInput.value = alias || wine.name;
-      wineInput.focus();
-    });
+    chip.addEventListener("click", () => startWine(wine));
     sampleList.appendChild(chip);
   });
 };
@@ -899,56 +910,6 @@ const handleSelection = (selection, sourceEl) => {
   setStatus("Korrekt - videre!", "success");
   renderStep();
 };
-
-const findWine = (input) => {
-  const normalized = input.trim().toLowerCase();
-  if (normalized === "allers vin") {
-    return wines.find((wine) => wine.name === "Alter Ego de Palmer 2022") || null;
-  }
-  if (normalized === "simons vin") {
-    return (
-      wines.find(
-        (wine) => wine.name === "Francis Coppola Director's Cut Pinot Noir Russian River Valley"
-      ) || null
-    );
-  }
-  if (normalized === "magnus vin") {
-    return wines.find((wine) => wine.name === "Vega Sicilia Bodegas Alion 2020") || null;
-  }
-  if (normalized === "axels vin") {
-    return wines.find((wine) => wine.name === "Chateau Fombrauge 2000") || null;
-  }
-  if (normalized === "kaaeres vin" || normalized === "kaares vin") {
-    return wines.find((wine) => wine.name === "Flor de Pingus 2016") || null;
-  }
-  return wines.find((wine) => wine.name.toLowerCase() === normalized) || null;
-};
-
-startBtn.addEventListener("click", () => {
-  const selected = findWine(wineInput.value);
-  if (!selected) {
-    wineHelp.textContent = "Fandt ikke vinen. Prøv en af eksemplerne herunder.";
-    setStatus("Venter på korrekt vin.");
-    return;
-  }
-  wineHelp.textContent = "";
-  state.wine = selected;
-  state.step = 0;
-  state.phase = "location";
-  state.yearStep = 0;
-  setActivePanels({ wine: false, location: true, year: false, grape: false, final: false });
-  state.answers = {
-    location: [],
-    year: [],
-    grape: [],
-    locationSkipped: false,
-    yearSkipped: false,
-    grapeSkipped: false,
-  };
-  winePanel.classList.add("hidden");
-  setStatus("Vin valgt - find landet.");
-  renderStep();
-});
 
 finalRestart.addEventListener("click", resetGame);
 nextBtnLocation.addEventListener("click", skipStep);
