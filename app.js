@@ -127,7 +127,7 @@ const wines = [
   },
   {
     name: "Vega Sicilia Bodegas Alion 2020",
-    year: 2020,
+    year: 2016,
     primaryGrape: "Tempranillo",
     grapes: ["Tempranillo"],
     path: ["Spain", "Ribera del Duero", "Vest (Valladolid)"],
