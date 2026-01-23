@@ -114,7 +114,7 @@ const wines = [
   {
     name: "Alter Ego de Palmer 2022",
     year: 2022,
-    primaryGrape: "Cabernet Sauvignon",
+    primaryGrape: "Merlot",
     grapes: ["Cabernet Sauvignon", "Merlot", "Petit Verdot"],
     path: ["France", "Bordeaux", "Haut-Medoc"],
   },
